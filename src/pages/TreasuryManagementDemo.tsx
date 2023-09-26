@@ -7,6 +7,7 @@ import LinearProgress from '@mui/material/LinearProgress'
 import Link from '@mui/material/Link'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import Input from '@mui/material/Input'
 import { utils } from 'ethers'
 import { useState } from 'react'
 
@@ -21,12 +22,13 @@ import { GELATO_SNIPPET } from 'src/utils/snippets'
 
 const transferAmount = 0.01
 
-const RelayerKitDemo = () => {
+const TreasuryManagementDemo = () => {
   const {
     chainId,
     chain,
 
-    safeSelected,
+    ownerAddress,
+
     safeBalance,
 
     isRelayerLoading,
@@ -44,16 +46,20 @@ const RelayerKitDemo = () => {
   const hasNativeFunds =
     !!safeBalance && Number(utils.formatEther(safeBalance || '0')) > transferAmount
 
+  const [inputValue, setInputValue] = useState('')
+
+  const handleInputChange = (event: any) => {
+    setInputValue(event.target.value)
+  }
+
   return (
     <>
       <Typography variant="h2" component="h1">
-        Change Owner
+        Treasury Management
       </Typography>
 
       <Typography marginTop="16px">
-        Allow users to pay fees using any ERC-20 tokens, without having to manage gas. Sponsor
-        transactions on behalf of your users. On your first relayed transaction, a Safe Account will
-        be automatically deployed and your address will be assigned as the Safe owner.
+        Allow users to change owners across multiple chains at once through a single transaction.
       </Typography>
 
       <Typography marginTop="24px" marginBottom="8px">
@@ -82,7 +88,7 @@ const RelayerKitDemo = () => {
 
       {!isAuthenticated ? (
         <AuthenticateMessage
-          message="Change Owner you need to be authenticated"
+          message="To use the Treasury Management Kit you need to be authenticated"
           onConnect={loginWeb3Auth}
         />
       ) : (
@@ -99,7 +105,7 @@ const RelayerKitDemo = () => {
             alignItems="flex-start"
             flexShrink={0}
           >
-            <Typography fontWeight="700">Relayed transaction</Typography>
+            <Typography fontWeight="700">Change owner transaction</Typography>
 
             {/* Gelato status label */}
             {gelatoTaskId && (
@@ -126,8 +132,15 @@ const RelayerKitDemo = () => {
                   disabled={!hasNativeFunds}
                   onClick={relayTransaction}
                 >
-                  Send Transaction
+                  Change Owner
                 </Button>
+
+                <Input
+                  placeholder="0x1234..."
+                  value={inputValue} // Bind the value to the state
+                  onChange={handleInputChange} // Step 5: Use the event handler
+                  fullWidth
+                />
 
                 {!hasNativeFunds && (
                   <Typography color="error">
@@ -145,17 +158,15 @@ const RelayerKitDemo = () => {
 
             {/* Transaction details */}
             <Stack gap={0.5} display="flex" flexDirection="column">
-              <Typography>
-                Transfer {transferAmount} {chain?.token}
-              </Typography>
+              <Typography>Change owner from</Typography>
 
-              {safeSelected && (
+              {ownerAddress && (
                 <Stack gap={0.5} display="flex" flexDirection="row">
-                  <AddressLabel address={safeSelected} showCopyIntoClipboardButton={false} />
+                  <AddressLabel address={ownerAddress} showCopyIntoClipboardButton={false} />
 
                   <ArrowRightAltRoundedIcon />
 
-                  <AddressLabel address={safeSelected} showCopyIntoClipboardButton={false} />
+                  <AddressLabel address={inputValue} showCopyIntoClipboardButton={false} />
                 </Stack>
               )}
             </Stack>
@@ -174,4 +185,4 @@ const RelayerKitDemo = () => {
   )
 }
 
-export default RelayerKitDemo
+export default TreasuryManagementDemo

@@ -24,22 +24,22 @@ const Intro = ({ setStep }: IntroProps) => {
       <img src={safeLogo} alt="safe logo" height="30px" />
 
       <Typography variant="h1" fontSize="64px" lineHeight="76px">
-        Account Abstraction SDK
+        Multichain Kit
       </Typography>
 
       <Typography variant="body1">
-        Add account abstraction functionality into your apps. Here you can find examples on how to
-        use our different kits:
+        The Multichain Kit is a collection of tools that will help manage your Safe on multiple
+        chains.
       </Typography>
 
       {/* Kit list */}
-      <Box display="flex" gap={2} marginTop="36px">
+      <Box display="grid" gap={2} marginTop="36px" gridTemplateColumns="repeat(2, 1fr)">
         <Box display="flex" gap={1}>
           <OrderLabel fontSize="10px" fontWeight="700">
             01
           </OrderLabel>
           <Typography fontWeight="700" fontSize="20px">
-            Auth Kit
+            Change Owner
           </Typography>
         </Box>
 
@@ -48,16 +48,7 @@ const Intro = ({ setStep }: IntroProps) => {
             02
           </OrderLabel>
           <Typography fontWeight="700" fontSize="20px">
-            Onramp Kit
-          </Typography>
-        </Box>
-
-        <Box display="flex" gap={1}>
-          <OrderLabel fontSize="10px" fontWeight="700">
-            03
-          </OrderLabel>
-          <Typography fontWeight="700" fontSize="20px">
-            Relay Kit
+            Treasury Management
           </Typography>
         </Box>
       </Box>
@@ -68,9 +59,9 @@ const Intro = ({ setStep }: IntroProps) => {
         To start using interactive demo select a network:
       </Typography>
 
-      <Typography>
+      {/* <Typography>
         Consider that the Onramp kit will only work on Mumbai test chain and US based connection.
-      </Typography>
+      </Typography> */}
 
       <Box display="flex" gap={2} marginTop="32px" alignItems="center">
         <ChainSelector />

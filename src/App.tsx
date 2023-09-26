@@ -8,14 +8,14 @@ import '@safe-global/safe-react-components/dist/fonts.css'
 
 import Header from 'src/components/header/Header'
 import Providers from 'src/components/providers/Providers'
-import AuthKitDemo from 'src/pages/AuthKitDemo'
+
 import Intro from 'src/pages/Intro'
-import OnRampKitDemo from 'src/pages/OnRampKitDemo'
-import RelayerKitDemo from 'src/pages/RelayerKitDemo'
 import NavMenu from './components/nav-menu/NavMenu'
 import SafeCoreInfo from './components/safe-core-info/SafeCoreInfo'
 import { useAccountAbstraction } from './store/accountAbstractionContext'
 import isMoneriumRedirect from './utils/isMoneriumRedirect'
+import TreasuryManagementDemo from './pages/TreasuryManagementDemo'
+import ChangeOwnerKitDemo from './pages/ChangeOwnerDemo'
 
 function App() {
   const { setChainId } = useAccountAbstraction()
@@ -116,17 +116,12 @@ const steps = [
     component: Intro
   },
   {
-    // Auth Kit step
-    component: AuthKitDemo,
-    nextLabel: 'to Onramp Kit'
-  },
-  {
-    // Onramp Kit step
-    component: OnRampKitDemo,
-    nextLabel: 'to Relay Kit'
+    // Relay Kit step
+    component: ChangeOwnerKitDemo,
+    nextLabel: 'to Treasury Management Kit'
   },
   {
     // Relay Kit step
-    component: RelayerKitDemo
+    component: TreasuryManagementDemo
   }
 ]
