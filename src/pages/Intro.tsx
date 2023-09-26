@@ -23,8 +23,8 @@ const Intro = ({ setStep }: IntroProps) => {
     >
       <img src={safeLogo} alt="safe logo" height="30px" />
 
-      <Typography variant="h1" fontSize="64px" lineHeight="76px">
-        Multichain Kit
+      <Typography variant="h1" fontSize="56px" lineHeight="76px">
+        Multichain Account Abstraction
       </Typography>
 
       <Typography variant="body1">
@@ -58,10 +58,6 @@ const Intro = ({ setStep }: IntroProps) => {
       <Typography variant="h2" fontWeight="700" fontSize="20px">
         To start using interactive demo select a network:
       </Typography>
-
-      {/* <Typography>
-        Consider that the Onramp kit will only work on Mumbai test chain and US based connection.
-      </Typography> */}
 
       <Box display="flex" gap={2} marginTop="32px" alignItems="center">
         <ChainSelector />

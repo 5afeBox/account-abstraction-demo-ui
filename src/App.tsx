@@ -54,13 +54,25 @@ function App() {
 
         {/* App header */}
         <Header setStep={setStep} />
-
+        {!isFirstStep && (
+          <Box
+            display="flex"
+            gap={3}
+            alignItems="flex-start"
+            maxWidth="1200px"
+            margin="120px auto 42px auto"
+          >
+            <Typography variant="h1" component="h1">
+              Multichain Account Abstraction
+            </Typography>
+          </Box>
+        )}
         <Box
           display="flex"
           gap={3}
           alignItems="flex-start"
           maxWidth="1200px"
-          margin="120px auto 42px auto"
+          margin="60px auto 42px auto"
         >
           {showSafeCoreVideo ? (
             <SafeCoreInfo />

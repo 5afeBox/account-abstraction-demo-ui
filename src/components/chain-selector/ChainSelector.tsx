@@ -5,6 +5,32 @@ import Select, { SelectChangeEvent } from '@mui/material/Select'
 import ChainLabel from 'src/components/chain-label/ChainLabel'
 import chains from 'src/chains/chains'
 import { useAccountAbstraction } from 'src/store/accountAbstractionContext'
+import { useState } from 'react'
+
+export const ChainDropDown = () => {
+  const [chainId, setChainId] = useState<string>(chains[0].id)
+
+  return (
+    <div>
+      <FormControl fullWidth sx={{ minWidth: '150px' }}>
+        <Select aria-label="chain selector" id="switch-chain-selector" value={chainId}>
+          {chains.map((chain) => (
+            <MenuItem value={chain.id} onClick={() => setChainId(chain.id)}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center'
+                }}
+              >
+                <ChainLabel chain={chain} />
+              </div>
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </div>
+  )
+}
 
 const ChainSelector = () => {
   const { chain, setChainId } = useAccountAbstraction()

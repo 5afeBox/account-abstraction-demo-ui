@@ -166,7 +166,10 @@ const ChangeOwnerKitDemo = () => {
 
                   <ArrowRightAltRoundedIcon />
 
-                  <AddressLabel address={inputValue} showCopyIntoClipboardButton={false} />
+                  <AddressLabel
+                    address={inputValue ?? '0x0000...0000'}
+                    showCopyIntoClipboardButton={false}
+                  />
                 </Stack>
               )}
             </Stack>

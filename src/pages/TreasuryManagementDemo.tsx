@@ -7,12 +7,12 @@ import LinearProgress from '@mui/material/LinearProgress'
 import Link from '@mui/material/Link'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import Input from '@mui/material/Input'
 import { utils } from 'ethers'
 import { useState } from 'react'
 
 import AddressLabel from 'src/components/address-label/AddressLabel'
 import AuthenticateMessage from 'src/components/authenticate-message/AuthenticateMessage'
+import { ChainDropDown } from 'src/components/chain-selector/ChainSelector'
 import Code from 'src/components/code/Code'
 import GelatoTaskStatusLabel from 'src/components/gelato-task-status-label/GelatoTaskStatusLabel'
 import SafeAccount from 'src/components/safe-account/SafeAccount'
@@ -27,8 +27,7 @@ const TreasuryManagementDemo = () => {
     chainId,
     chain,
 
-    ownerAddress,
-
+    safeSelected,
     safeBalance,
 
     isRelayerLoading,
@@ -46,12 +45,6 @@ const TreasuryManagementDemo = () => {
   const hasNativeFunds =
     !!safeBalance && Number(utils.formatEther(safeBalance || '0')) > transferAmount
 
-  const [inputValue, setInputValue] = useState('')
-
-  const handleInputChange = (event: any) => {
-    setInputValue(event.target.value)
-  }
-
   return (
     <>
       <Typography variant="h2" component="h1">
@@ -59,7 +52,9 @@ const TreasuryManagementDemo = () => {
       </Typography>
 
       <Typography marginTop="16px">
-        Allow users to change owners across multiple chains at once through a single transaction.
+        Allow users to pay fees using any ERC-20 tokens, without having to manage gas. Sponsor
+        transactions on behalf of your users. On your first relayed transaction, a Safe Account will
+        be automatically deployed and your address will be assigned as the Safe owner.
       </Typography>
 
       <Typography marginTop="24px" marginBottom="8px">
@@ -88,7 +83,7 @@ const TreasuryManagementDemo = () => {
 
       {!isAuthenticated ? (
         <AuthenticateMessage
-          message="To use the Treasury Management Kit you need to be authenticated"
+          message="Change Owner you need to be authenticated"
           onConnect={loginWeb3Auth}
         />
       ) : (
@@ -105,7 +100,7 @@ const TreasuryManagementDemo = () => {
             alignItems="flex-start"
             flexShrink={0}
           >
-            <Typography fontWeight="700">Change owner transaction</Typography>
+            <Typography fontWeight="700">Relayed transaction</Typography>
 
             {/* Gelato status label */}
             {gelatoTaskId && (
@@ -132,15 +127,10 @@ const TreasuryManagementDemo = () => {
                   disabled={!hasNativeFunds}
                   onClick={relayTransaction}
                 >
-                  Change Owner
+                  Send Transaction
                 </Button>
 
-                <Input
-                  placeholder="0x1234..."
-                  value={inputValue} // Bind the value to the state
-                  onChange={handleInputChange} // Step 5: Use the event handler
-                  fullWidth
-                />
+                <ChainDropDown />
 
                 {!hasNativeFunds && (
                   <Typography color="error">
@@ -158,15 +148,17 @@ const TreasuryManagementDemo = () => {
 
             {/* Transaction details */}
             <Stack gap={0.5} display="flex" flexDirection="column">
-              <Typography>Change owner from</Typography>
+              <Typography>
+                Transfer {transferAmount} {chain?.token}
+              </Typography>
 
-              {ownerAddress && (
+              {safeSelected && (
                 <Stack gap={0.5} display="flex" flexDirection="row">
-                  <AddressLabel address={ownerAddress} showCopyIntoClipboardButton={false} />
+                  <AddressLabel address={safeSelected} showCopyIntoClipboardButton={false} />
 
                   <ArrowRightAltRoundedIcon />
 
-                  <AddressLabel address={inputValue} showCopyIntoClipboardButton={false} />
+                  <AddressLabel address={safeSelected} showCopyIntoClipboardButton={false} />
                 </Stack>
               )}
             </Stack>
