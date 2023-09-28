@@ -24,6 +24,7 @@ const transferAmount = 0.01
 const tokenAmount = 10
 
 const TreasuryManagementDemo = () => {
+  const tokenApproved = false
   const {
     chainId,
     chain,
@@ -120,36 +121,39 @@ const TreasuryManagementDemo = () => {
                 <Typography fontSize="14px">
                   Check the status of your relayed transaction.
                 </Typography>
-
-                {/* send fake transaction to Gelato relayer */}
-                <Button
-                  startIcon={<SendIcon />}
-                  variant="contained"
-                  disabled={!hasNativeFunds}
-                  onClick={async () => {
-                    if (safeSelected)
-                      await crosschainSend({
-                        srcChain: 'ethereum',
-                        dstChain: 'polygon',
-                        to: safeSelected,
-                        tokenSymbol: 'aUSDC',
-                        amount: '10'
-                      })
-                  }}
-                >
-                  Send Token
-                </Button>
-                <Button
-                  startIcon={<SendIcon />}
-                  variant="contained"
-                  disabled={!hasNativeFunds}
-                  onClick={approveToken}
-                >
-                  Approve Token
-                </Button>
-
-                <ChainDropDown />
-
+                <Box display="flex" gap={2}>
+                  {!tokenApproved && (
+                    <Button
+                      variant="contained"
+                      disabled={!hasNativeFunds}
+                      onClick={approveToken}
+                      hidden={tokenApproved}
+                    >
+                      Approve Token
+                    </Button>
+                  )}
+                  {/* send fake transaction to Gelato relayer */}
+                  {tokenApproved && (
+                    <Button
+                      startIcon={<SendIcon />}
+                      variant="contained"
+                      disabled={!hasNativeFunds}
+                      onClick={async () => {
+                        if (safeSelected)
+                          await crosschainSend({
+                            srcChain: 'ethereum',
+                            dstChain: 'polygon',
+                            to: safeSelected,
+                            tokenSymbol: 'aUSDC',
+                            amount: '10'
+                          })
+                      }}
+                    >
+                      Send Token
+                    </Button>
+                  )}
+                  <ChainDropDown />
+                </Box>
                 {!hasNativeFunds && (
                   <Typography color="error">
                     Insufficient funds. Send some funds to the Safe Account
@@ -171,9 +175,7 @@ const TreasuryManagementDemo = () => {
               {safeSelected && (
                 <Stack gap={0.5} display="flex" flexDirection="row">
                   <AddressLabel address={safeSelected} showCopyIntoClipboardButton={false} />
-
                   <ArrowRightAltRoundedIcon />
-
                   <AddressLabel address={safeSelected} showCopyIntoClipboardButton={false} />
                 </Stack>
               )}
