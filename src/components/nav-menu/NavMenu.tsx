@@ -37,6 +37,14 @@ const NavMenu = ({ setStep, activeStep }: NavMenuProps) => {
             Treasury Management
           </Typography>
         </NavItem>
+        <NavItem onClick={() => setStep(3)} active={activeStep === 3}>
+          <OrderLabel fontSize="10px" fontWeight="700">
+            +
+          </OrderLabel>
+          <Typography fontWeight="700" fontSize="20px" marginLeft="12px">
+            Init wallet
+          </Typography>
+        </NavItem>
       </MenuList>
     </NavMenuContainer>
   )

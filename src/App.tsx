@@ -14,6 +14,7 @@ import NavMenu from './components/nav-menu/NavMenu'
 import SafeCoreInfo from './components/safe-core-info/SafeCoreInfo'
 import { useAccountAbstraction } from './store/accountAbstractionContext'
 import isMoneriumRedirect from './utils/isMoneriumRedirect'
+import RelayerKitDemo from './pages/RelayerKitDemo'
 import TreasuryManagementDemo from './pages/TreasuryManagementDemo'
 import ChangeOwnerKitDemo from './pages/ChangeOwnerDemo'
 
@@ -134,6 +135,11 @@ const steps = [
   },
   {
     // Relay Kit step
-    component: TreasuryManagementDemo
+    component: TreasuryManagementDemo,
+    nextLabel: 'to Relayer Kit'
+  },
+  {
+    // Relayer Kit step
+    component: RelayerKitDemo
   }
 ]

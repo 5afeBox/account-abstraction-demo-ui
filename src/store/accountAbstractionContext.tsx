@@ -10,6 +10,8 @@ import { MoneriumPack, StripePack } from '@safe-global/onramp-kit'
 import { GelatoRelayPack } from '@safe-global/relay-kit'
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 import { MetaTransactionData, MetaTransactionOptions } from '@safe-global/safe-core-sdk-types'
+import { CHAINS, Environment, AxelarQueryAPI } from '@axelar-network/axelarjs-sdk'
+import testnetConfig from './config/testnet.json'
 
 import { initialChain } from 'src/chains/chains'
 import usePolling from 'src/hooks/usePolling'
@@ -17,6 +19,13 @@ import Chain from 'src/models/chain'
 import getChain from 'src/utils/getChain'
 import getMoneriumInfo, { MoneriumInfo } from 'src/utils/getMoneriumInfo'
 import isMoneriumRedirect from 'src/utils/isMoneriumRedirect'
+type crossChainSend = {
+  srcChain: string
+  dstChain: string
+  to: string
+  amount: string
+  tokenSymbol: string
+}
 
 type accountAbstractionContextValue = {
   ownerAddress?: string
@@ -39,6 +48,8 @@ type accountAbstractionContextValue = {
   startMoneriumFlow: () => Promise<void>
   closeMoneriumFlow: () => void
   moneriumInfo?: MoneriumInfo
+  crosschainSend: (data: crossChainSend) => Promise<void>
+  approveToken: () => Promise<void>
 }
 
 const initialState = {
@@ -55,7 +66,9 @@ const initialState = {
   openStripeWidget: async () => {},
   closeStripeWidget: async () => {},
   startMoneriumFlow: async () => {},
-  closeMoneriumFlow: () => {}
+  closeMoneriumFlow: () => {},
+  crosschainSend: async () => {},
+  approveToken: async () => {}
 }
 
 const accountAbstractionContext = createContext<accountAbstractionContextValue>(initialState)
@@ -71,6 +84,7 @@ const useAccountAbstraction = () => {
 }
 
 const MONERIUM_TOKEN = 'monerium_token'
+const CROSSCHAIN_EXECUABLE_ADDRESS = '0x94C35B4Dfb8D01A668AbCAB1AC44c84F8242472f'
 
 const AccountAbstractionProvider = ({ children }: { children: JSX.Element }) => {
   // owner address from the email  (provided by web3Auth)
@@ -308,7 +322,6 @@ const AccountAbstractionProvider = ({ children }: { children: JSX.Element }) => 
       const signer = web3Provider.getSigner()
       const relayPack = new GelatoRelayPack()
       const safeAccountAbstraction = new AccountAbstraction(signer)
-
       await safeAccountAbstraction.init({ relayPack })
 
       // we use a dump safe transfer as a demo transaction
@@ -317,6 +330,119 @@ const AccountAbstractionProvider = ({ children }: { children: JSX.Element }) => 
           to: safeSelected,
           data: '0x',
           value: utils.parseUnits('0.01', 'ether').toString(),
+          operation: 0 // OperationType.Call,
+        }
+      ]
+
+      const options: MetaTransactionOptions = {
+        isSponsored: false,
+        gasLimit: '600000', // in this alfa version we need to manually set the gas limit
+        gasToken: ethers.constants.AddressZero // native token
+      }
+
+      const gelatoTaskId = await safeAccountAbstraction.relayTransaction(dumpSafeTransafer, options)
+
+      setIsRelayerLoading(false)
+      setGelatoTaskId(gelatoTaskId)
+    }
+  }
+
+  // crosschain-kit implementation using Gelato
+  const crosschainTransaction = async (data: string, value: string) => {
+    if (web3Provider) {
+      setIsRelayerLoading(true)
+
+      const signer = web3Provider.getSigner()
+      const relayPack = new GelatoRelayPack()
+      const safeAccountAbstraction = new AccountAbstraction(signer)
+      await safeAccountAbstraction.init({ relayPack })
+
+      // we use a dump safe transfer as a demo transaction
+      const dumpSafeTransafer: MetaTransactionData[] = [
+        {
+          to: CROSSCHAIN_EXECUABLE_ADDRESS,
+          data: data,
+          value: value,
+          operation: 0 // OperationType.Call,
+        }
+      ]
+
+      const options: MetaTransactionOptions = {
+        isSponsored: false,
+        gasLimit: '600000', // in this alfa version we need to manually set the gas limit
+        gasToken: ethers.constants.AddressZero // native token
+      }
+
+      const gelatoTaskId = await safeAccountAbstraction.relayTransaction(dumpSafeTransafer, options)
+
+      setIsRelayerLoading(false)
+      setGelatoTaskId(gelatoTaskId)
+    }
+  }
+
+  const crosschainSend = async ({
+    srcChain,
+    dstChain,
+    to,
+    amount,
+    tokenSymbol
+  }: {
+    srcChain: string
+    dstChain: string
+    to: string
+    amount: string
+    tokenSymbol: string
+  }) => {
+    const { chains: testnetChains } = testnetConfig
+    const CROSSCHAIN_EXECUABLE_ABI = [
+      'function crossChainSend(string memory destinationChain,string memory destinationAddress,address destRecipient,string memory symbol,uint256 amount) external payable'
+    ]
+
+    const iface = new ethers.utils.Interface(CROSSCHAIN_EXECUABLE_ABI)
+    const data = iface.encodeFunctionData('crossChainSend', [
+      dstChain,
+      CROSSCHAIN_EXECUABLE_ADDRESS,
+      to,
+      tokenSymbol,
+      ethers.utils.parseUnits(amount, 'mwei').toString()
+    ])
+    const axlQueryApi = new AxelarQueryAPI({ environment: Environment.TESTNET })
+    const src_chain = testnetChains[srcChain as keyof typeof testnetChains]
+    const dst_chain = testnetChains[dstChain as keyof typeof testnetChains]
+    const gasFee = await axlQueryApi.estimateGasFee(
+      src_chain.id,
+      dst_chain.id,
+      src_chain.tokenSymbol
+    )
+    await crosschainTransaction(data, gasFee.toString())
+  }
+
+  const approveToken = async () => {
+    const ERC20_APPROVE_ABI = [
+      'function approve(address spender, uint256 amount) external returns (bool)'
+    ]
+    const iface = new ethers.utils.Interface(ERC20_APPROVE_ABI)
+    const data = iface.encodeFunctionData('approve', [
+      CROSSCHAIN_EXECUABLE_ADDRESS,
+      ethers.utils.parseUnits('10000000000', 'ether').toString()
+    ])
+
+    if (web3Provider) {
+      setIsRelayerLoading(true)
+
+      const signer = web3Provider.getSigner()
+      const relayPack = new GelatoRelayPack()
+      const safeAccountAbstraction = new AccountAbstraction(signer)
+      await safeAccountAbstraction.init({ relayPack })
+
+      const aUSDC = '0x254d06f33bDc5b8ee05b2ea472107E300226659A'
+
+      // we use a dump safe transfer as a demo transaction
+      const dumpSafeTransafer: MetaTransactionData[] = [
+        {
+          to: aUSDC,
+          data: data,
+          value: '0',
           operation: 0 // OperationType.Call,
         }
       ]
@@ -409,7 +535,10 @@ const AccountAbstractionProvider = ({ children }: { children: JSX.Element }) => 
 
     startMoneriumFlow,
     closeMoneriumFlow,
-    moneriumInfo
+    moneriumInfo,
+
+    crosschainSend,
+    approveToken
   }
 
   return (

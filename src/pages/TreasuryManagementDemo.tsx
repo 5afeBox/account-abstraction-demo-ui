@@ -21,6 +21,7 @@ import { useAccountAbstraction } from 'src/store/accountAbstractionContext'
 import { GELATO_SNIPPET } from 'src/utils/snippets'
 
 const transferAmount = 0.01
+const tokenAmount = 10
 
 const TreasuryManagementDemo = () => {
   const {
@@ -31,7 +32,9 @@ const TreasuryManagementDemo = () => {
     safeBalance,
 
     isRelayerLoading,
-    relayTransaction,
+    // relayTransaction,
+    crosschainSend,
+    approveToken,
     gelatoTaskId,
 
     isAuthenticated,
@@ -39,8 +42,6 @@ const TreasuryManagementDemo = () => {
   } = useAccountAbstraction()
 
   const [transactionHash, setTransactionHash] = useState<string>('')
-
-  // TODO: ADD PAY FEES USING USDC TOKEN
 
   const hasNativeFunds =
     !!safeBalance && Number(utils.formatEther(safeBalance || '0')) > transferAmount
@@ -125,9 +126,26 @@ const TreasuryManagementDemo = () => {
                   startIcon={<SendIcon />}
                   variant="contained"
                   disabled={!hasNativeFunds}
-                  onClick={relayTransaction}
+                  onClick={async () => {
+                    if (safeSelected)
+                      await crosschainSend({
+                        srcChain: 'ethereum',
+                        dstChain: 'polygon',
+                        to: safeSelected,
+                        tokenSymbol: 'aUSDC',
+                        amount: '10'
+                      })
+                  }}
                 >
-                  Send Transaction
+                  Send Token
+                </Button>
+                <Button
+                  startIcon={<SendIcon />}
+                  variant="contained"
+                  disabled={!hasNativeFunds}
+                  onClick={approveToken}
+                >
+                  Approve Token
                 </Button>
 
                 <ChainDropDown />
@@ -148,9 +166,7 @@ const TreasuryManagementDemo = () => {
 
             {/* Transaction details */}
             <Stack gap={0.5} display="flex" flexDirection="column">
-              <Typography>
-                Transfer {transferAmount} {chain?.token}
-              </Typography>
+              <Typography>Transfer {tokenAmount} aUSDC</Typography>
 
               {safeSelected && (
                 <Stack gap={0.5} display="flex" flexDirection="row">

@@ -65,7 +65,20 @@ export const mumbaiChain: Chain = {
   faucetUrl: 'https://mumbaifaucet.com/'
 }
 
-const chains: Chain[] = [gnosisChain, goerliChain, mainnetChain, mumbaiChain, polygonChain]
+export const avalanceFujiChain: Chain = {
+  id: '0xa869',
+  token: 'AVAX',
+  shortName: 'AVAX',
+  label: 'Avalanche Fuji',
+  rpcUrl: 'https://api.avax-test.network/ext/bc/C/rpc',
+  blockExplorerUrl: 'https://cchain.explorer.avax-test.network',
+  // fill red
+  color: '#f44336',
+  isStripePaymentsEnabled: false,
+  isMoneriumPaymentsEnabled: false
+}
+
+const chains: Chain[] = [gnosisChain, goerliChain, mainnetChain, mumbaiChain, polygonChain, avalanceFujiChain]
 
 export const initialChain = goerliChain
 
