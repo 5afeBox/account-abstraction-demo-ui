@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import Tooltip from '@mui/material/Tooltip'
-import { Skeleton, Theme } from '@mui/material'
+import { Box, Skeleton, Theme } from '@mui/material'
 import styled from '@emotion/styled'
 import { utils } from 'ethers'
 
@@ -33,8 +33,6 @@ function SafeInfo({ safeAddress, chainId, destination }: SafeInfoProps) {
   const [isDeployed, setIsDeployed] = useState<boolean>(false)
   const [isDeployLoading, setIsDeployLoading] = useState<boolean>(true)
 
-  const { isDarkTheme } = useTheme()
-
   // detect if the safe is deployed with polling
   const detectSafeIsDeployed = useCallback(async () => {
     const isDeployed = await isContractAddress(safeAddress, web3Provider)
@@ -64,11 +62,22 @@ function SafeInfo({ safeAddress, chainId, destination }: SafeInfoProps) {
         {isLoading ? (
           <Skeleton variant="circular" width={50} height={50} />
         ) : (
-          <img
-            src={isDarkTheme ? safeLogoDark : safeLogoLight}
-            alt="connected Safe account logo"
-            height="50px"
-          />
+          <Box
+            height="49px"
+            width="49px"
+            bgcolor={destination ? destinationChain?.color : chain?.color}
+            borderRadius="50%"
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            color="black"
+            fontSize="12px"
+            margin="1px"
+          >
+            {destination
+              ? destinationChain?.label.slice(0, 3).toLocaleUpperCase()
+              : chain?.label.slice(0, 3).toLocaleUpperCase()}
+          </Box>
         )}
 
         {/* Threshold & owners label */}

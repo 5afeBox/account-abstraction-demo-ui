@@ -18,7 +18,6 @@ const Label = styled('span')(
     border-radius: 4px;
     font-size: 12px;
     padding: 0px 12px;
-    border: 1px solid #fff;
     background-color: ${color};
     color: ${theme.palette.getContrastText(color as string)};
     text-align: center;

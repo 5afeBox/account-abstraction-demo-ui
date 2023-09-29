@@ -39,8 +39,8 @@ export const DestinationChainSelector = () => {
     <div>
       <FormControl fullWidth sx={{ minWidth: '150px' }}>
         <Select
-          aria-label="chain selector"
-          id="switch-chain-selector"
+          aria-label="destination chain selector"
+          id="switch-destination-chain-selector"
           value={destinationChain?.id}
           onChange={(event: SelectChangeEvent) =>
             setDestinationChainId(event.target.value as string)

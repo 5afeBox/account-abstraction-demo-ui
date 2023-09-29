@@ -91,7 +91,7 @@ const TreasuryManagementDemo = () => {
       ) : (
         <Box display="flex" gap={3}>
           {/* safe Account */}
-          <SafeAccount flex={1} />
+          <SafeAccount flex={1} destination />
 
           {/* Relay Transaction */}
           <ConnectedContainer

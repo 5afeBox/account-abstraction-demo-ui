@@ -11,6 +11,7 @@ import ChainLabel from 'src/components/chain-label/ChainLabel'
 import safeHeaderLogo from 'src/assets/safe-header-logo.svg'
 import { useTheme } from 'src/store/themeContext'
 import { useAccountAbstraction } from 'src/store/accountAbstractionContext'
+import ChainSelector from '../chain-selector/ChainSelector'
 
 type HeaderProps = {
   setStep: (newStep: number) => void
@@ -38,7 +39,7 @@ function Header({ setStep }: HeaderProps) {
             {/* chain label */}
             {chain && (
               <Box display="flex" justifyContent="flex-end" alignItems="center">
-                <ChainLabel chain={chain} />
+                <ChainSelector />
               </Box>
             )}
 
