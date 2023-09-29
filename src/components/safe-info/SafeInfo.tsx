@@ -16,19 +16,21 @@ import usePolling from 'src/hooks/usePolling'
 import { useAccountAbstraction } from 'src/store/accountAbstractionContext'
 import { useTheme } from 'src/store/themeContext'
 import isContractAddress from 'src/utils/isContractAddress'
+import Chain from 'src/models/chain'
 
 type SafeInfoProps = {
   safeAddress: string
-  chainId: string
+  chain: Chain
   destination?: boolean
+  balance?: string
 }
 
 // TODO: ADD USDC LABEL
 // TODO: ADD CHAIN LABEL
 
-function SafeInfo({ safeAddress, chainId, destination }: SafeInfoProps) {
-  const { web3Provider, chain, destinationChain, safeBalance, destinationSafeBalance } =
-    useAccountAbstraction()
+function SafeInfo({ safeAddress, chain, destination, balance }: SafeInfoProps) {
+  const { id: chainId, color: chainColor, label: chainLabel } = chain
+  const { web3Provider, safeBalance } = useAccountAbstraction()
 
   const [isDeployed, setIsDeployed] = useState<boolean>(false)
   const [isDeployLoading, setIsDeployLoading] = useState<boolean>(true)
@@ -65,7 +67,7 @@ function SafeInfo({ safeAddress, chainId, destination }: SafeInfoProps) {
           <Box
             height="49px"
             width="49px"
-            bgcolor={destination ? destinationChain?.color : chain?.color}
+            bgcolor={chainColor}
             borderRadius="50%"
             display="flex"
             justifyContent="center"
@@ -74,9 +76,7 @@ function SafeInfo({ safeAddress, chainId, destination }: SafeInfoProps) {
             fontSize="12px"
             margin="1px"
           >
-            {destination
-              ? destinationChain?.label.slice(0, 3).toLocaleUpperCase()
-              : chain?.label.slice(0, 3).toLocaleUpperCase()}
+            {chainLabel.slice(0, 3).toLocaleUpperCase()}
           </Box>
         )}
 
@@ -93,7 +93,7 @@ function SafeInfo({ safeAddress, chainId, destination }: SafeInfoProps) {
       <Stack direction="column" spacing={0.5} alignItems="flex-start">
         {/* Safe address label */}
         <Typography variant="body2">
-          <AddressLabel address={safeAddress} showBlockExplorerLink destination={destination} />
+          <AddressLabel address={safeAddress} showBlockExplorerLink chain={chain} />
         </Typography>
 
         {isLoading && <Skeleton variant="text" width={110} height={20} />}
@@ -112,13 +112,10 @@ function SafeInfo({ safeAddress, chainId, destination }: SafeInfoProps) {
           <AmountContainer>
             {/* Safe Balance */}
             <Typography fontWeight="700">
-              <AmountLabel
-                amount={utils.formatEther(destinationSafeBalance || '0')}
-                tokenSymbol={destinationChain?.token || ''}
-              />
+              <AmountLabel amount={balance || '0'} tokenSymbol={chain?.bridgeToken?.symbol || ''} />
             </Typography>
           </AmountContainer>
-        ) : (
+        ) : !isLoading ? (
           <AmountContainer>
             {/* Safe Balance */}
             <Typography fontWeight="700">
@@ -128,7 +125,7 @@ function SafeInfo({ safeAddress, chainId, destination }: SafeInfoProps) {
               />
             </Typography>
           </AmountContainer>
-        )}
+        ) : null}
       </Stack>
     </Stack>
   )

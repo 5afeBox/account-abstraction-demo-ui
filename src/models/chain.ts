@@ -11,6 +11,11 @@ type Chain = {
   isStripePaymentsEnabled: boolean // only available in Mumbai chain
   isMoneriumPaymentsEnabled: boolean // only available in Goerli chain
   faucetUrl?: string
+  bridgeChainId: string
+  bridgeToken?: {
+    address: string
+    symbol: string
+  }
 }
 
 export default Chain

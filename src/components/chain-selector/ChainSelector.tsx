@@ -5,7 +5,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select'
 import ChainLabel from 'src/components/chain-label/ChainLabel'
 import chains from 'src/chains/chains'
 import { useAccountAbstraction } from 'src/store/accountAbstractionContext'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export const ChainDropDown = () => {
   const [chainId, setChainId] = useState<string>(chains[0].id)
@@ -33,7 +33,12 @@ export const ChainDropDown = () => {
 }
 
 export const DestinationChainSelector = () => {
-  const { destinationChain, setDestinationChainId } = useAccountAbstraction()
+  const { destinationChainId, destinationChain, setDestinationChainId, setDestinationChain } =
+    useAccountAbstraction()
+
+  useEffect(() => {
+    setDestinationChain()
+  }, [destinationChain, destinationChainId])
 
   return (
     <div>

@@ -7,7 +7,7 @@ import LinearProgress from '@mui/material/LinearProgress'
 import Link from '@mui/material/Link'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import { utils } from 'ethers'
+import { ethers, utils } from 'ethers'
 import { useState } from 'react'
 
 import AddressLabel from 'src/components/address-label/AddressLabel'
@@ -24,7 +24,7 @@ const transferAmount = 0.01
 const tokenAmount = 10
 
 const TreasuryManagementDemo = () => {
-  const tokenApproved = false
+  // const tokenApproved = false
   const {
     chainId,
     chain,
@@ -40,13 +40,22 @@ const TreasuryManagementDemo = () => {
     gelatoTaskId,
 
     isAuthenticated,
-    loginWeb3Auth
+    loginWeb3Auth,
+    safeCrossChainAllowance,
+    safeErc20Balance
   } = useAccountAbstraction()
 
   const [transactionHash, setTransactionHash] = useState<string>('')
 
   const hasNativeFunds =
     !!safeBalance && Number(utils.formatEther(safeBalance || '0')) > transferAmount
+
+  // console.log('safeCrossChainAllowance', safeCrossChainAllowance)
+  // console.log('safeErc20Balance', safeErc20Balance)
+  const hasTokenFunds =
+    safeCrossChainAllowance && safeErc20Balance
+      ? ethers.BigNumber.from(safeCrossChainAllowance).gte(ethers.BigNumber.from(safeErc20Balance))
+      : false
 
   return (
     <>
@@ -97,27 +106,26 @@ const TreasuryManagementDemo = () => {
               <>
                 <Typography fontSize="14px">Check the status of your transaction.</Typography>
                 <Box display="flex" gap={2}>
-                  {!tokenApproved && (
+                  {/* {console.log('hasTokenFunds', hasTokenFunds)} */}
+                  {!hasTokenFunds ? (
                     <Button
                       variant="contained"
                       disabled={!hasNativeFunds}
                       onClick={approveToken}
-                      hidden={tokenApproved}
+                      hidden={false}
                     >
                       Approve Token
                     </Button>
-                  )}
-                  {/* send fake transaction to Gelato relayer */}
-                  {tokenApproved && (
+                  ) : (
                     <Button
                       startIcon={<SendIcon />}
                       variant="contained"
                       disabled={!hasNativeFunds}
                       onClick={async () => {
-                        if (safeSelected)
+                        if (safeSelected && chain && destinationChain)
                           await crosschainSend({
-                            srcChain: 'ethereum',
-                            dstChain: 'polygon',
+                            srcChain: chain.bridgeChainId,
+                            dstChain: destinationChain.bridgeChainId,
                             to: safeSelected,
                             tokenSymbol: 'aUSDC',
                             amount: '10'
@@ -127,6 +135,7 @@ const TreasuryManagementDemo = () => {
                       Send Token
                     </Button>
                   )}
+
                   <DestinationChainSelector />
                 </Box>
                 {!hasNativeFunds && (

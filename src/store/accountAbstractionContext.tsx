@@ -55,6 +55,10 @@ type accountAbstractionContextValue = {
   moneriumInfo?: MoneriumInfo
   crosschainSend: (data: crossChainSend) => Promise<void>
   approveToken: () => Promise<void>
+  safeErc20Balance?: ethers.BigNumberish
+  destinationErc20Balance?: string
+  setDestinationChain: () => void
+  safeCrossChainAllowance?: ethers.BigNumberish
 }
 
 const initialState = {
@@ -75,7 +79,8 @@ const initialState = {
   startMoneriumFlow: async () => {},
   closeMoneriumFlow: () => {},
   crosschainSend: async () => {},
-  approveToken: async () => {}
+  approveToken: async () => {},
+  setDestinationChain: () => {}
 }
 
 const accountAbstractionContext = createContext<accountAbstractionContextValue>(initialState)
@@ -114,7 +119,7 @@ const AccountAbstractionProvider = ({ children }: { children: JSX.Element }) => 
   // web3 provider to perform signatures
   const [web3Provider, setWeb3Provider] = useState<ethers.providers.Web3Provider>()
   const [destinationWeb3Provider, setDestinationWeb3Provider] =
-    useState<ethers.providers.Web3Provider>()
+    useState<ethers.providers.JsonRpcProvider>()
 
   const isAuthenticated = !!ownerAddress && !!chainId
   const chain = getChain(chainId) || initialChain
@@ -128,15 +133,13 @@ const AccountAbstractionProvider = ({ children }: { children: JSX.Element }) => 
     setWeb3Provider(undefined)
     setSafeSelected('')
   }, [chain])
-  useEffect(() => {
-    setDestinationChainId(destinationChain.id)
-    setDestinationWeb3Provider(undefined)
-  }, [destinationChain])
+  // useEffect(() => {
+  //   setDestinationChainId(destinationChain.id)
+  //   setDestinationWeb3Provider(undefined)
+  // }, [destinationChain])
 
   // authClient
   const [web3AuthModalPack, setWeb3AuthModalPack] = useState<Web3AuthModalPack>()
-  const [destinationWeb3AuthModalPack, setDestinationWeb3AuthModalPack] =
-    useState<Web3AuthModalPack>()
 
   // onRampClient
   const [stripePack, setStripePack] = useState<StripePack>()
@@ -193,19 +196,19 @@ const AccountAbstractionProvider = ({ children }: { children: JSX.Element }) => 
 
       setWeb3AuthModalPack(web3AuthModalPack)
 
-      const destinationWeb3AuthModalPack = new Web3AuthModalPack({
-        txServiceUrl: destinationChain.transactionServiceUrl
-      })
+      //   const destinationWeb3AuthModalPack = new Web3AuthModalPack({
+      //     txServiceUrl: destinationChain.transactionServiceUrl
+      //   })
 
-      await destinationWeb3AuthModalPack.init({
-        options,
-        adapters: [openloginAdapter],
-        modalConfig
-      })
+      //   await destinationWeb3AuthModalPack.init({
+      //     options,
+      //     adapters: [openloginAdapter],
+      //     modalConfig
+      //   })
 
-      setDestinationWeb3AuthModalPack(destinationWeb3AuthModalPack)
+      //   setDestinationWeb3AuthModalPack(destinationWeb3AuthModalPack)
     })()
-  }, [chain, destinationChain])
+  }, [chain])
 
   // auth-kit implementation
   const loginWeb3Auth = useCallback(async () => {
@@ -226,11 +229,11 @@ const AccountAbstractionProvider = ({ children }: { children: JSX.Element }) => 
   }, [chain, web3AuthModalPack])
 
   const setDestinationChain = useCallback(async () => {
-    const provider =
-      destinationWeb3AuthModalPack?.getProvider() as ethers.providers.ExternalProvider
+    const provider = new ethers.providers.JsonRpcProvider(destinationChain.rpcUrl)
     setDestinationChainId(destinationChain.id)
-    setDestinationWeb3Provider(new ethers.providers.Web3Provider(provider))
-  }, [destinationChain])
+    // console.log('destinationChain.provider', provider)
+    setDestinationWeb3Provider(provider)
+  }, [destinationChainId])
 
   useEffect(() => {
     if (web3AuthModalPack && web3AuthModalPack.getProvider()) {
@@ -461,7 +464,7 @@ const AccountAbstractionProvider = ({ children }: { children: JSX.Element }) => 
     const iface = new ethers.utils.Interface(ERC20_APPROVE_ABI)
     const data = iface.encodeFunctionData('approve', [
       CROSSCHAIN_EXECUABLE_ADDRESS,
-      ethers.utils.parseUnits('10000000000', 'ether').toString()
+      ethers.utils.parseUnits('100000', 6).toString()
     ])
 
     if (web3Provider) {
@@ -541,6 +544,36 @@ const AccountAbstractionProvider = ({ children }: { children: JSX.Element }) => 
 
     return balance?.toString()
   }, [web3Provider, safeSelected])
+  const fetchErc20Balance = async (
+    addr: string,
+    provider: ethers.providers.JsonRpcProvider | undefined
+  ) => {
+    const erc20 = new ethers.Contract(
+      addr,
+      ['function balanceOf(address account) external view returns (uint256)'],
+      provider
+    )
+    const balance = await erc20.balanceOf(safeSelected)
+    return balance
+  }
+
+  const fetchChainErc20Balance = useCallback(async () => {
+    const balance = await fetchErc20Balance(chain.bridgeToken?.address || '', web3Provider)
+    // return ethers.utils.formatUnits(balance, 6).toString()
+    return balance
+  }, [web3Provider, safeSelected])
+
+  const fetchDstErc20Balance = useCallback(async () => {
+    // if (destinationWeb3Provider) {
+    // console.log('fetch dst erc20 balance', destinationWeb3Provider)
+
+    const balance = await fetchErc20Balance(
+      destinationChain.bridgeToken?.address || '',
+      destinationWeb3Provider
+    )
+    return ethers.utils.formatUnits(balance, 6).toString()
+    // }
+  }, [destinationWeb3Provider, safeSelected])
 
   const fetchDestinationSafeBalance = useCallback(async () => {
     const balance = await destinationWeb3Provider?.getBalance(safeSelected)
@@ -548,8 +581,21 @@ const AccountAbstractionProvider = ({ children }: { children: JSX.Element }) => 
     return balance?.toString()
   }, [destinationWeb3Provider, safeSelected])
 
+  const fetchSafeCrossChainAllowance = useCallback(async () => {
+    const erc20 = new ethers.Contract(
+      chain.bridgeToken?.address || '',
+      ['function allowance(address owner, address spender) external view returns (uint256)'],
+      web3Provider
+    )
+    const allowance = await erc20.allowance(safeSelected, CROSSCHAIN_EXECUABLE_ADDRESS)
+    return allowance
+  }, [web3Provider, safeSelected])
+
   const safeBalance = usePolling(fetchSafeBalance)
+  const safeErc20Balance = usePolling(fetchChainErc20Balance)
+  const destinationErc20Balance = usePolling(fetchDstErc20Balance)
   const destinationSafeBalance = usePolling(fetchDestinationSafeBalance)
+  const safeCrossChainAllowance = usePolling(fetchSafeCrossChainAllowance)
 
   const state = {
     ownerAddress,
@@ -588,7 +634,11 @@ const AccountAbstractionProvider = ({ children }: { children: JSX.Element }) => 
     moneriumInfo,
 
     crosschainSend,
-    approveToken
+    approveToken,
+
+    safeErc20Balance,
+    destinationErc20Balance,
+    safeCrossChainAllowance
   }
 
   return (

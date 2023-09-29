@@ -6,13 +6,15 @@ import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined'
 
 import useMemoizedAddressLabel from 'src/hooks/useMemoizedAddressLabel'
 import { useAccountAbstraction } from 'src/store/accountAbstractionContext'
+import Chain from 'src/models/chain'
 
 type AddressLabelProps = {
   address: string
   isTransactionAddress?: boolean
   showBlockExplorerLink?: boolean
   showCopyIntoClipboardButton?: boolean
-  destination?: boolean
+  chain?: Chain
+  // destination?: boolean
 }
 
 const AddressLabel = ({
@@ -20,15 +22,16 @@ const AddressLabel = ({
   isTransactionAddress,
   showBlockExplorerLink,
   showCopyIntoClipboardButton = true,
-  destination
-}: AddressLabelProps) => {
-  const { chain, destinationChain } = useAccountAbstraction()
+  chain
+}: // destination
+AddressLabelProps) => {
+  // const { destinationChain } = useAccountAbstraction()
 
   const addressLabel = useMemoizedAddressLabel(address)
 
-  const blockExplorerLink = `${
-    destination ? destinationChain?.blockExplorerUrl : chain?.blockExplorerUrl
-  }/${isTransactionAddress ? 'tx' : 'address'}/${address}`
+  // const blockExplorerLink = `${
+  //   destination ? destinationChain?.blockExplorerUrl : chain?.blockExplorerUrl
+  // }/${isTransactionAddress ? 'tx' : 'address'}/${address}`
 
   return (
     <Stack direction="row" alignItems="center" justifyContent="center" component="span">
@@ -54,11 +57,11 @@ const AddressLabel = ({
       )}
 
       {/* Button to etherscan */}
-      {showBlockExplorerLink && blockExplorerLink && (
+      {showBlockExplorerLink && (
         <Tooltip title={'View details on block explorer'}>
           <IconButton
             component="a"
-            href={blockExplorerLink}
+            href={`${chain?.blockExplorerUrl}/address/${address}`}
             target="_blank"
             rel="noopener"
             size={'small'}
