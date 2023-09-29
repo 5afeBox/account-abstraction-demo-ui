@@ -28,6 +28,7 @@ const TreasuryManagementDemo = () => {
   const {
     chainId,
     chain,
+    destinationChain,
 
     safeSelected,
     safeBalance,
@@ -53,34 +54,10 @@ const TreasuryManagementDemo = () => {
         Treasury Management
       </Typography>
 
-      <Typography marginTop="16px">
+      <Typography marginTop="16px" marginBottom="28px">
         Allow users to pay fees using any ERC-20 tokens, without having to manage gas. Sponsor
         transactions on behalf of your users. On your first relayed transaction, a Safe Account will
         be automatically deployed and your address will be assigned as the Safe owner.
-      </Typography>
-
-      <Typography marginTop="24px" marginBottom="8px">
-        Find more info at:
-      </Typography>
-
-      <Stack direction="row" alignItems="center" spacing={2}>
-        <Link
-          href="https://github.com/safe-global/safe-core-sdk/tree/main/packages/relay-kit"
-          target="_blank"
-        >
-          Github
-        </Link>
-
-        <Link href="https://docs.safe.global/safe-core-aa-sdk/relay-kit" target="_blank">
-          Documentation
-        </Link>
-      </Stack>
-
-      <Divider sx={{ margin: '32px 0 28px 0' }} />
-
-      {/* Relay Demo */}
-      <Typography variant="h4" component="h2" fontWeight="700" marginBottom="16px">
-        Interactive demo
       </Typography>
 
       {!isAuthenticated ? (
@@ -102,7 +79,7 @@ const TreasuryManagementDemo = () => {
             alignItems="flex-start"
             flexShrink={0}
           >
-            <Typography fontWeight="700">Relayed transaction</Typography>
+            <Typography fontWeight="700">Crosschain fund transaction</Typography>
 
             {/* Gelato status label */}
             {gelatoTaskId && (
@@ -118,9 +95,7 @@ const TreasuryManagementDemo = () => {
 
             {!isRelayerLoading && !gelatoTaskId && (
               <>
-                <Typography fontSize="14px">
-                  Check the status of your relayed transaction.
-                </Typography>
+                <Typography fontSize="14px">Check the status of your transaction.</Typography>
                 <Box display="flex" gap={2}>
                   {!tokenApproved && (
                     <Button
@@ -174,23 +149,15 @@ const TreasuryManagementDemo = () => {
 
               {safeSelected && (
                 <Stack gap={0.5} display="flex" flexDirection="row">
-                  <AddressLabel address={safeSelected} showCopyIntoClipboardButton={false} />
+                  <Typography>{chain?.label}</Typography>
                   <ArrowRightAltRoundedIcon />
-                  <AddressLabel address={safeSelected} showCopyIntoClipboardButton={false} />
+                  <Typography>{destinationChain?.label}</Typography>
                 </Stack>
               )}
             </Stack>
           </ConnectedContainer>
         </Box>
       )}
-
-      <Divider style={{ margin: '40px 0 30px 0' }} />
-
-      <Typography variant="h3" component="h2" fontWeight="700" marginBottom="16px">
-        How to use it
-      </Typography>
-
-      <Code text={GELATO_SNIPPET} language={'javascript'} />
     </>
   )
 }

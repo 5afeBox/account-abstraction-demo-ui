@@ -86,7 +86,7 @@ function App() {
             <ActiveStepComponent setStep={setStep} />
 
             {/* next & back Buttons */}
-            {!isFirstStep && (
+            {/* {!isFirstStep && (
               <Stack direction="row" alignItems="center" spacing={2} marginTop="32px">
                 <Button onClick={previousStep} variant="outlined">
                   Back
@@ -113,7 +113,7 @@ function App() {
                   </>
                 )}
               </Stack>
-            )}
+            )} */}
           </main>
         </Box>
       </>
@@ -135,8 +135,7 @@ const steps = [
   },
   {
     // Relay Kit step
-    component: TreasuryManagementDemo,
-    nextLabel: 'to Relayer Kit'
+    component: TreasuryManagementDemo
   },
   {
     // Relayer Kit step

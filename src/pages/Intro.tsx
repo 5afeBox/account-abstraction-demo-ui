@@ -21,7 +21,10 @@ const Intro = ({ setStep }: IntroProps) => {
       paddingTop="72px"
       paddingLeft="100px"
     >
-      <img src={safeLogo} alt="safe logo" height="30px" />
+      {/* <img src={safeLogo} alt="safe logo" height="30px" /> */}
+      <Typography variant="h2" fontSize="36px" color="gray">
+        Xafe
+      </Typography>
 
       <Typography variant="h1" fontSize="56px" lineHeight="76px">
         Multichain Account Abstraction

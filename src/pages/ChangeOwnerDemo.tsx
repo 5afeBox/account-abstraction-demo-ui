@@ -58,32 +58,8 @@ const ChangeOwnerKitDemo = () => {
         Change Owner
       </Typography>
 
-      <Typography marginTop="16px">
+      <Typography marginTop="16px" marginBottom="28px">
         Allow users to change owners across multiple chains at once through a single transaction.
-      </Typography>
-
-      <Typography marginTop="24px" marginBottom="8px">
-        Find more info at:
-      </Typography>
-
-      <Stack direction="row" alignItems="center" spacing={2}>
-        <Link
-          href="https://github.com/safe-global/safe-core-sdk/tree/main/packages/relay-kit"
-          target="_blank"
-        >
-          Github
-        </Link>
-
-        <Link href="https://docs.safe.global/safe-core-aa-sdk/relay-kit" target="_blank">
-          Documentation
-        </Link>
-      </Stack>
-
-      <Divider sx={{ margin: '32px 0 28px 0' }} />
-
-      {/* Relay Demo */}
-      <Typography variant="h4" component="h2" fontWeight="700" marginBottom="16px">
-        Interactive demo
       </Typography>
 
       {!isAuthenticated ? (
@@ -121,9 +97,7 @@ const ChangeOwnerKitDemo = () => {
 
             {!isRelayerLoading && !gelatoTaskId && (
               <>
-                <Typography fontSize="14px">
-                  Check the status of your relayed transaction.
-                </Typography>
+                <Typography fontSize="14px">Check the status of your transaction</Typography>
 
                 {/* send fake transaction to Gelato relayer */}
                 <Button
@@ -176,14 +150,6 @@ const ChangeOwnerKitDemo = () => {
           </ConnectedContainer>
         </Box>
       )}
-
-      <Divider style={{ margin: '40px 0 30px 0' }} />
-
-      <Typography variant="h3" component="h2" fontWeight="700" marginBottom="16px">
-        How to use it
-      </Typography>
-
-      <Code text={GELATO_SNIPPET} language={'javascript'} />
     </>
   )
 }
