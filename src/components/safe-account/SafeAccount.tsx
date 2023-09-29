@@ -6,7 +6,9 @@ import { ConnectedContainer } from 'src/components/styles'
 import { useAccountAbstraction } from 'src/store/accountAbstractionContext'
 
 function SafeAccount(props: BoxProps) {
-  const { safeSelected, chainId } = useAccountAbstraction()
+  const { safeSelected, chainId, destinationChainId } = useAccountAbstraction()
+
+  console.log('SafeAccount', safeSelected, chainId, destinationChainId)
 
   return (
     <ConnectedContainer {...props}>
@@ -18,6 +20,9 @@ function SafeAccount(props: BoxProps) {
 
       {/* Safe Info */}
       {safeSelected && <SafeInfo safeAddress={safeSelected} chainId={chainId} />}
+      {safeSelected && (
+        <SafeInfo safeAddress={safeSelected} chainId={destinationChainId} destination />
+      )}
     </ConnectedContainer>
   )
 }

@@ -32,6 +32,38 @@ export const ChainDropDown = () => {
   )
 }
 
+export const DestinationChainSelector = () => {
+  const { destinationChain, setDestinationChainId } = useAccountAbstraction()
+
+  return (
+    <div>
+      <FormControl fullWidth sx={{ minWidth: '150px' }}>
+        <Select
+          aria-label="chain selector"
+          id="switch-chain-selector"
+          value={destinationChain?.id}
+          onChange={(event: SelectChangeEvent) =>
+            setDestinationChainId(event.target.value as string)
+          }
+        >
+          {chains.map((chain) => (
+            <MenuItem value={chain.id} onClick={() => setDestinationChainId(chain.id)}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center'
+                }}
+              >
+                <ChainLabel chain={chain} />
+              </div>
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </div>
+  )
+}
+
 const ChainSelector = () => {
   const { chain, setChainId } = useAccountAbstraction()
 

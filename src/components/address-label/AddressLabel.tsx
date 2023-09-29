@@ -12,21 +12,23 @@ type AddressLabelProps = {
   isTransactionAddress?: boolean
   showBlockExplorerLink?: boolean
   showCopyIntoClipboardButton?: boolean
+  destination?: boolean
 }
 
 const AddressLabel = ({
   address,
   isTransactionAddress,
   showBlockExplorerLink,
-  showCopyIntoClipboardButton = true
+  showCopyIntoClipboardButton = true,
+  destination
 }: AddressLabelProps) => {
-  const { chain } = useAccountAbstraction()
+  const { chain, destinationChain } = useAccountAbstraction()
 
   const addressLabel = useMemoizedAddressLabel(address)
 
-  const blockExplorerLink = `${chain?.blockExplorerUrl}/${
-    isTransactionAddress ? 'tx' : 'address'
-  }/${address}`
+  const blockExplorerLink = `${
+    destination ? destinationChain?.blockExplorerUrl : chain?.blockExplorerUrl
+  }/${isTransactionAddress ? 'tx' : 'address'}/${address}`
 
   return (
     <Stack direction="row" alignItems="center" justifyContent="center" component="span">

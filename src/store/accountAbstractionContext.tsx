@@ -13,7 +13,7 @@ import { MetaTransactionData, MetaTransactionOptions } from '@safe-global/safe-c
 import { CHAINS, Environment, AxelarQueryAPI } from '@axelar-network/axelarjs-sdk'
 import testnetConfig from './config/testnet.json'
 
-import { initialChain } from 'src/chains/chains'
+import { initialChain, initialDestinationChain } from 'src/chains/chains'
 import usePolling from 'src/hooks/usePolling'
 import Chain from 'src/models/chain'
 import getChain from 'src/utils/getChain'
@@ -30,15 +30,20 @@ type crossChainSend = {
 type accountAbstractionContextValue = {
   ownerAddress?: string
   chainId: string
+  destinationChainId: string
   safes: string[]
   chain?: Chain
+  destinationChain?: Chain
   isAuthenticated: boolean
   web3Provider?: ethers.providers.Web3Provider
+  destinationWeb3Provider?: ethers.providers.Web3Provider
   loginWeb3Auth: () => void
   logoutWeb3Auth: () => void
   setChainId: (chainId: string) => void
+  setDestinationChainId: (chainId: string) => void
   safeSelected?: string
   safeBalance?: string
+  destinationSafeBalance?: string
   setSafeSelected: React.Dispatch<React.SetStateAction<string>>
   isRelayerLoading: boolean
   relayTransaction: () => Promise<void>
@@ -58,10 +63,12 @@ const initialState = {
   logoutWeb3Auth: () => {},
   relayTransaction: async () => {},
   setChainId: () => {},
+  setDestinationChainId: () => {},
   setSafeSelected: () => {},
   onRampWithStripe: async () => {},
   safes: [],
   chainId: initialChain.id,
+  destinationChainId: initialDestinationChain.id,
   isRelayerLoading: true,
   openStripeWidget: async () => {},
   closeStripeWidget: async () => {},
@@ -102,11 +109,16 @@ const AccountAbstractionProvider = ({ children }: { children: JSX.Element }) => 
     return initialChain.id
   })
 
+  const [destinationChainId, setDestinationChainId] = useState<string>(initialDestinationChain.id)
+
   // web3 provider to perform signatures
   const [web3Provider, setWeb3Provider] = useState<ethers.providers.Web3Provider>()
+  const [destinationWeb3Provider, setDestinationWeb3Provider] =
+    useState<ethers.providers.Web3Provider>()
 
   const isAuthenticated = !!ownerAddress && !!chainId
   const chain = getChain(chainId) || initialChain
+  const destinationChain = getChain(destinationChainId) || initialDestinationChain
 
   // reset React state when you switch the chain
   useEffect(() => {
@@ -116,9 +128,15 @@ const AccountAbstractionProvider = ({ children }: { children: JSX.Element }) => 
     setWeb3Provider(undefined)
     setSafeSelected('')
   }, [chain])
+  useEffect(() => {
+    setDestinationChainId(destinationChain.id)
+    setDestinationWeb3Provider(undefined)
+  }, [destinationChain])
 
   // authClient
   const [web3AuthModalPack, setWeb3AuthModalPack] = useState<Web3AuthModalPack>()
+  const [destinationWeb3AuthModalPack, setDestinationWeb3AuthModalPack] =
+    useState<Web3AuthModalPack>()
 
   // onRampClient
   const [stripePack, setStripePack] = useState<StripePack>()
@@ -174,8 +192,20 @@ const AccountAbstractionProvider = ({ children }: { children: JSX.Element }) => 
       })
 
       setWeb3AuthModalPack(web3AuthModalPack)
+
+      const destinationWeb3AuthModalPack = new Web3AuthModalPack({
+        txServiceUrl: destinationChain.transactionServiceUrl
+      })
+
+      await destinationWeb3AuthModalPack.init({
+        options,
+        adapters: [openloginAdapter],
+        modalConfig
+      })
+
+      setDestinationWeb3AuthModalPack(destinationWeb3AuthModalPack)
     })()
-  }, [chain])
+  }, [chain, destinationChain])
 
   // auth-kit implementation
   const loginWeb3Auth = useCallback(async () => {
@@ -194,6 +224,13 @@ const AccountAbstractionProvider = ({ children }: { children: JSX.Element }) => 
       console.log('error: ', error)
     }
   }, [chain, web3AuthModalPack])
+
+  const setDestinationChain = useCallback(async () => {
+    const provider =
+      destinationWeb3AuthModalPack?.getProvider() as ethers.providers.ExternalProvider
+    setDestinationChainId(destinationChain.id)
+    setDestinationWeb3Provider(new ethers.providers.Web3Provider(provider))
+  }, [destinationChain])
 
   useEffect(() => {
     if (web3AuthModalPack && web3AuthModalPack.getProvider()) {
@@ -505,12 +542,21 @@ const AccountAbstractionProvider = ({ children }: { children: JSX.Element }) => 
     return balance?.toString()
   }, [web3Provider, safeSelected])
 
+  const fetchDestinationSafeBalance = useCallback(async () => {
+    const balance = await destinationWeb3Provider?.getBalance(safeSelected)
+
+    return balance?.toString()
+  }, [destinationWeb3Provider, safeSelected])
+
   const safeBalance = usePolling(fetchSafeBalance)
+  const destinationSafeBalance = usePolling(fetchDestinationSafeBalance)
 
   const state = {
     ownerAddress,
     chainId,
+    destinationChainId,
     chain,
+    destinationChain,
     safes,
 
     isAuthenticated,
@@ -521,9 +567,13 @@ const AccountAbstractionProvider = ({ children }: { children: JSX.Element }) => 
     logoutWeb3Auth,
 
     setChainId,
+    setDestinationChainId,
+
+    setDestinationChain,
 
     safeSelected,
     safeBalance,
+    destinationSafeBalance,
     setSafeSelected,
 
     isRelayerLoading,

@@ -12,7 +12,7 @@ import { useState } from 'react'
 
 import AddressLabel from 'src/components/address-label/AddressLabel'
 import AuthenticateMessage from 'src/components/authenticate-message/AuthenticateMessage'
-import { ChainDropDown } from 'src/components/chain-selector/ChainSelector'
+import { DestinationChainSelector } from 'src/components/chain-selector/ChainSelector'
 import Code from 'src/components/code/Code'
 import GelatoTaskStatusLabel from 'src/components/gelato-task-status-label/GelatoTaskStatusLabel'
 import SafeAccount from 'src/components/safe-account/SafeAccount'
@@ -152,7 +152,7 @@ const TreasuryManagementDemo = () => {
                       Send Token
                     </Button>
                   )}
-                  <ChainDropDown />
+                  <DestinationChainSelector />
                 </Box>
                 {!hasNativeFunds && (
                   <Typography color="error">

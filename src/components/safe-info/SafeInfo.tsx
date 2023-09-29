@@ -20,13 +20,15 @@ import isContractAddress from 'src/utils/isContractAddress'
 type SafeInfoProps = {
   safeAddress: string
   chainId: string
+  destination?: boolean
 }
 
 // TODO: ADD USDC LABEL
 // TODO: ADD CHAIN LABEL
 
-function SafeInfo({ safeAddress, chainId }: SafeInfoProps) {
-  const { web3Provider, chain, safeBalance } = useAccountAbstraction()
+function SafeInfo({ safeAddress, chainId, destination }: SafeInfoProps) {
+  const { web3Provider, chain, destinationChain, safeBalance, destinationSafeBalance } =
+    useAccountAbstraction()
 
   const [isDeployed, setIsDeployed] = useState<boolean>(false)
   const [isDeployLoading, setIsDeployLoading] = useState<boolean>(true)
@@ -82,7 +84,7 @@ function SafeInfo({ safeAddress, chainId }: SafeInfoProps) {
       <Stack direction="column" spacing={0.5} alignItems="flex-start">
         {/* Safe address label */}
         <Typography variant="body2">
-          <AddressLabel address={safeAddress} showBlockExplorerLink />
+          <AddressLabel address={safeAddress} showBlockExplorerLink destination={destination} />
         </Typography>
 
         {isLoading && <Skeleton variant="text" width={110} height={20} />}
@@ -97,7 +99,17 @@ function SafeInfo({ safeAddress, chainId }: SafeInfoProps) {
           </CreationPendingLabel>
         )}
 
-        {!isLoading && (
+        {!isLoading && destination ? (
+          <AmountContainer>
+            {/* Safe Balance */}
+            <Typography fontWeight="700">
+              <AmountLabel
+                amount={utils.formatEther(destinationSafeBalance || '0')}
+                tokenSymbol={destinationChain?.token || ''}
+              />
+            </Typography>
+          </AmountContainer>
+        ) : (
           <AmountContainer>
             {/* Safe Balance */}
             <Typography fontWeight="700">

@@ -78,8 +78,17 @@ export const avalanceFujiChain: Chain = {
   isMoneriumPaymentsEnabled: false
 }
 
-const chains: Chain[] = [gnosisChain, goerliChain, mainnetChain, mumbaiChain, polygonChain, avalanceFujiChain]
+const chains: Chain[] = [
+  gnosisChain,
+  goerliChain,
+  mainnetChain,
+  mumbaiChain,
+  polygonChain,
+  avalanceFujiChain
+]
 
 export const initialChain = goerliChain
+
+export const initialDestinationChain = mumbaiChain
 
 export default chains
