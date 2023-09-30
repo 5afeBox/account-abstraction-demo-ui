@@ -126,12 +126,12 @@ const steps = [
   },
   {
     // Relay Kit step
-    component: ChangeOwnerKitDemo,
-    nextLabel: 'to Treasury Management Kit'
+    component: TreasuryManagementDemo,
+    nextLabel: 'to Change Owner Kit'
   },
   {
     // Relay Kit step
-    component: TreasuryManagementDemo
+    component: ChangeOwnerKitDemo
   },
   {
     // Relayer Kit step

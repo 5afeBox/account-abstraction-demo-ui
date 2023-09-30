@@ -25,7 +25,7 @@ const NavMenu = ({ setStep, activeStep }: NavMenuProps) => {
             01
           </OrderLabel>
           <Typography fontWeight="700" fontSize="20px" marginLeft="12px">
-            Change Owner
+            Treasury Management
           </Typography>
         </NavItem>
 
@@ -34,9 +34,10 @@ const NavMenu = ({ setStep, activeStep }: NavMenuProps) => {
             02
           </OrderLabel>
           <Typography fontWeight="700" fontSize="20px" marginLeft="12px">
-            Treasury Management
+            Change Owner
           </Typography>
         </NavItem>
+
         <NavItem onClick={() => setStep(3)} active={activeStep === 3}>
           <OrderLabel active={activeStep === 3} fontSize="10px" fontWeight="700">
             +
