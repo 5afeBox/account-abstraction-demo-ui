@@ -76,6 +76,16 @@ const ChainSelector = () => {
     <div>
       <FormControl fullWidth sx={{ minWidth: '150px' }}>
         <Select
+          variant="outlined"
+          sx={{
+            width: 100,
+            height: 40,
+            border: '1px solid transparent',
+            color: '#fff',
+            '& .MuiSvgIcon-root': {
+              color: 'white'
+            }
+          }}
           aria-label="chain selector"
           id="switch-chain-selector"
           value={chain?.id}

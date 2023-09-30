@@ -5,7 +5,7 @@ import Divider from '@mui/material/Divider'
 import styled from '@emotion/styled'
 import { Theme } from '@mui/material'
 
-import safeLogo from 'src/assets/safe-logo.svg'
+import xafeLogo from 'src/assets/logo/gray.png'
 import ChainSelector from 'src/components/chain-selector/ChainSelector'
 
 type IntroProps = {
@@ -14,17 +14,8 @@ type IntroProps = {
 
 const Intro = ({ setStep }: IntroProps) => {
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="flex-start"
-      paddingTop="72px"
-      paddingLeft="100px"
-    >
-      {/* <img src={safeLogo} alt="safe logo" height="30px" /> */}
-      <Typography variant="h2" fontSize="36px" color="gray">
-        Xafe
-      </Typography>
+    <Box display="flex" flexDirection="column" alignItems="center" paddingTop="72px">
+      <img src={xafeLogo} alt="safe logo" height="30px" />
 
       <Typography variant="h1" fontSize="56px" lineHeight="76px">
         Multichain Account Abstraction
@@ -56,13 +47,9 @@ const Intro = ({ setStep }: IntroProps) => {
         </Box>
       </Box>
 
-      <Divider style={{ alignSelf: 'stretch', margin: '42px 0' }} />
+      <Divider style={{ margin: '42px 0', width: '50%' }} />
 
-      <Typography variant="h2" fontWeight="700" fontSize="20px">
-        To start using interactive demo select a network:
-      </Typography>
-
-      <Box display="flex" gap={2} marginTop="32px" alignItems="center">
+      <Box display="flex" gap={2} alignItems="center">
         <ChainSelector />
 
         <Button variant="contained" onClick={() => setStep(1)}>

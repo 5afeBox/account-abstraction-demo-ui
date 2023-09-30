@@ -75,11 +75,7 @@ function App() {
           maxWidth="1200px"
           margin="60px auto 42px auto"
         >
-          {showSafeCoreVideo ? (
-            <SafeCoreInfo />
-          ) : (
-            <NavMenu setStep={setStep} activeStep={activeStep} />
-          )}
+          {!showSafeCoreVideo && <NavMenu setStep={setStep} activeStep={activeStep} />}
 
           <main style={{ flexGrow: 1 }}>
             {/* Active Step Component */}

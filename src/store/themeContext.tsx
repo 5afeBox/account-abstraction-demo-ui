@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect } from 'react'
-import { PaletteMode, Theme } from '@mui/material'
+import { PaletteMode, Theme, createTheme } from '@mui/material'
 import { ThemeProvider as MUIThemeProvider } from '@mui/material/styles'
 import { SafeThemeProvider, useThemeMode } from '@safe-global/safe-react-components'
 
@@ -63,7 +63,11 @@ const ThemeProvider = ({ children }: { children: JSX.Element }) => {
   return (
     <themeContext.Provider value={state}>
       <SafeThemeProvider mode={themeMode}>
-        {(safeTheme: Theme) => <MUIThemeProvider theme={safeTheme}>{children}</MUIThemeProvider>}
+        {(safeTheme: Theme) => {
+          safeTheme.palette.primary.main = '#89E13D'
+          safeTheme.palette.primary.dark = '#61B11B'
+          return <MUIThemeProvider theme={safeTheme}>{children}</MUIThemeProvider>
+        }}
       </SafeThemeProvider>
     </themeContext.Provider>
   )

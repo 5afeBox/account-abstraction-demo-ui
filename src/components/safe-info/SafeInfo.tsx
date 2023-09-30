@@ -10,11 +10,10 @@ import AddressLabel from 'src/components/address-label/AddressLabel'
 import AmountLabel from 'src/components/amount-label/AmountLabel'
 import getSafeInfo from 'src/api/getSafeInfo'
 import useApi from 'src/hooks/useApi'
-import safeLogoLight from 'src/assets/safe-info-logo-light.svg'
-import safeLogoDark from 'src/assets/safe-info-logo-dark.svg'
+
 import usePolling from 'src/hooks/usePolling'
 import { useAccountAbstraction } from 'src/store/accountAbstractionContext'
-import { useTheme } from 'src/store/themeContext'
+
 import isContractAddress from 'src/utils/isContractAddress'
 import Chain from 'src/models/chain'
 

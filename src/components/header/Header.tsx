@@ -8,7 +8,7 @@ import DarkThemeIcon from '@mui/icons-material/Brightness4'
 import LightThemeIcon from '@mui/icons-material/Brightness7'
 
 import ChainLabel from 'src/components/chain-label/ChainLabel'
-import safeHeaderLogo from 'src/assets/safe-header-logo.svg'
+import xafeHeaderLogo from 'src/assets/logo/dark-small.png'
 import { useTheme } from 'src/store/themeContext'
 import { useAccountAbstraction } from 'src/store/accountAbstractionContext'
 import ChainSelector from '../chain-selector/ChainSelector'
@@ -31,7 +31,8 @@ function Header({ setStep }: HeaderProps) {
             style={{ cursor: 'pointer' }}
             onClick={() => setStep(0)} // go to Home
             id="app-logo-header"
-            src={safeHeaderLogo}
+            src={xafeHeaderLogo}
+            height="20px"
             alt="app logo"
           />
 
